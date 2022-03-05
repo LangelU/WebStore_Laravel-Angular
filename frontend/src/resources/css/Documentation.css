@@ -248,3 +248,16 @@
     display: none;
   }
 }
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+  background-color: white;
+  text-align: center;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+th,td {
+  border: 1px solid black;
+}

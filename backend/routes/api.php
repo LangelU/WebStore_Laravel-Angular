@@ -19,6 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('register', 'App\Http\Controllers\UserController@register');
+//Create a new customer
+Route::post('newCustomer','App\Http\Controllers\UserController@createCustomerUser');
+//Create a new Staff member
+Route::post('newStaff','App\Http\Controllers\UserController@createStaffUser');
+
 Route::post('login', 'App\Http\Controllers\UserController@authenticate');
 
 Route::group(['middleware' => ['jwt.verify']], function() {
@@ -27,27 +32,35 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     // Create a new business
     Route::post('newBusiness','App\Http\Controllers\BusinessController@createBusiness');
     // Edit business
-    Route::post('editBusiness','App\Http\Controllers\BusinessController@updateBusiness');
+    Route::put('updateBusiness/{id}','App\Http\Controllers\BusinessController@updateBusiness');
+    // Show Business
+    Route::get('showBusiness','App\Http\Controllers\BusinessController@showBusiness');
 
     /*** Categories Endpoints ***/
     //Create a new category
     Route::post('newCategory','App\Http\Controllers\CategoryController@createCategory');
     // Edit a category
-    Route::put('editCategory','App\Http\Controllers\CategoryController@updateCategory');
+    Route::put('updateCategory/{id}','App\Http\Controllers\CategoryController@updateCategory');
     // Show all categories
     Route::get('showCategories','App\Http\Controllers\CategoryController@showCategories');
+    // Edit category
+    Route::get('editCategory/{id}','App\Http\Controllers\CategoryController@editCategory');
     // Delete a category
-    Route::post('deleteCategory','App\Http\Controllers\CategoryController@deleteCategory');
+    Route::delete('deleteCategory/{id}','App\Http\Controllers\CategoryController@deleteCategory');
 
     /*** Customers Endpoints ***/
-    //Create a new customer
-    Route::post('newCustomer','App\Http\Controllers\CustomerController@createCustomer');
     // Edit a customer
     Route::put('editCustomer','App\Http\Controllers\CustomerController@updateCustomer');
     // Show all customers
     Route::get('showCustomers','App\Http\Controllers\CustomerController@showCustomers');
     // Delete a customer
     Route::post('deleteCategory','App\Http\Controllers\CustomerController@deleteCustomer');
+    // Update customer profile
+    Route::put('updateCustomerProfile/{id}',
+    'App\Http\Controllers\CustomerController@updateCustomerProfile');
+    // Update customer account
+    Route::put('updateCustomerAccount/{id}',
+    'App\Http\Controllers\UserController@updateCustomerAccount');
 
     /*** Favorites Endpoints ***/
     //Create a new favorite
@@ -137,11 +150,11 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     //Create a new tag
     Route::post('newTag','App\Http\Controllers\TagController@createTag');
     // Edit a tag
-    Route::put('editTag','App\Http\Controllers\TagController@updateTag');
+    Route::put('updateTag/{id}','App\Http\Controllers\TagController@updateTag');
     // Show all tags
     Route::get('showTags','App\Http\Controllers\TagController@showTags');
     // Delete a tag
-    Route::post('deleteTag','App\Http\Controllers\TagController@deleteTag');
+    Route::delete('deleteTag/{id}','App\Http\Controllers\TagController@deleteTag');
 
     //Rutas de Usuario
     Route::post('user','App\Http\Controllers\UserController@getAuthenticatedUser');
