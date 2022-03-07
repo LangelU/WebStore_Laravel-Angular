@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+
 Route::post('register', 'App\Http\Controllers\UserController@register');
 //Create a new customer
 Route::post('newCustomer','App\Http\Controllers\UserController@createCustomerUser');
@@ -90,7 +92,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     /*** Products Endpoints ***/
     //Create a new product
-    Route::post('newProduct','App\Http\Controllers\ProductController@createProduct');
+    Route::post('newPicture','App\Http\Controllers\ProductController@uploadProductPicture');
     // Edit a product
     Route::put('editProduct','App\Http\Controllers\ProductController@updateProduct');
     // Show all products

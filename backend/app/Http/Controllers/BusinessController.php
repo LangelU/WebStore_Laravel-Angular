@@ -14,6 +14,7 @@ class BusinessController extends Controller
         //
     }
 
+    //Create a new Business
     public function createBusiness(Request $request) {
         $validateUniqueBusiness = DB::table('businesses')
                                 ->select("*")->get();
@@ -34,18 +35,23 @@ class BusinessController extends Controller
             $newBusiness->cellphone     = $request->input("bus_cellphone");
 
             $newBusiness->save();
-            return response()->json(['successfull' => 'business_created'], 200);
+            return response ()->json (['status'=>'success','message'=>
+            'Business created Successfully','response'=>['data'=>$newBusiness]], 200);
         }
-        return response()->json(['error' => 'could_not_create_business'], 409);
+        return response ()->json (['status'=>'error','message'=>
+        'Could not create business','response'=> 'Already exists the business'], 409);
     }
 
+    //Show business data
     public function showBusiness(Business $business) {
         $business = DB::table('businesses')->select("*")->get();      
 
         if ($business->isEmpty()) {
-             return response()->json(['business_not_found'], 404);
+            return response ()->json (['status'=>'error','message'=>
+            'Business not found'], 404);
         }
-        return response()->json($business);
+        return response ()->json (['status'=>'success','message'=>
+        'Business found', 'response'=> ['data'=>$business]], 200);
     }
 
     public function editBusiness(Business $business) {
@@ -83,7 +89,9 @@ class BusinessController extends Controller
                         WHERE ID    = $id";
 
         $businessUpdated = DB::select($businessSQL);
-        return response()->json(['successfull' => 'business_updated'], 200); 
+        $businessData = DB::table("businesses")->select("*")->get();
+        return response ()->json (['status'=>'success','message'=>
+        'Business updated Successfully','response'=>['data'=>$businessData]], 200); 
     }
 
     public function destroy(Business $business)

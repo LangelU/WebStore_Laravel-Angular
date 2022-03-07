@@ -24,7 +24,8 @@ class UserController extends Controller
       } catch (JWTException $e) {
           return response()->json(['error' => 'could_not_create_token'], 500);
       }
-      return response()->json(compact('token'));
+      return response()->json(['status' => 'success', 'message' => 
+      'Logged in', 'token' => $token]);
     }
 
     public function getAuthenticatedUser()
@@ -107,10 +108,12 @@ class UserController extends Controller
             ]);
 
             $token = JWTAuth::fromUser($user);
-            return response()->json(['successfull' => 'customer_created'], 200);
-            //return response()->json(compact('user','token'),201);
+            return response ()->json (['status'=>'success','message'=>
+            'User created Successfully','response'=>['data'=>$newCustomer]], 200); 
+            
         }
-        return response()->json(['error' => 'could_not_create_customer'], 409);
+        return response ()->json (['status'=>'error','message'=>
+        'Could not create the user','response'=> 'Alreade exists the user'], 409); 
         
      }
 
@@ -148,10 +151,12 @@ class UserController extends Controller
             ]);
 
             $token = JWTAuth::fromUser($user);
-            return response()->json(['successfull' => 'staff_member_created'], 200);
+            return response ()->json (['status'=>'success','message'=>
+            'Staff created Successfully','response'=>['data'=>$newStaff]], 200);
             //return response()->json(compact('user','token'),201);
         }
-        return response()->json(['error' => 'could_not_create_staff_member'], 409);
+        return response ()->json (['status'=>'error','message'=>
+        'Could not create the staff','response'=> 'Alreade exists the staff'], 409); 
         
      }          
 }
