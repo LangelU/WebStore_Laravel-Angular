@@ -23,9 +23,9 @@ class CreateBusinessesTable extends Migration
             $table->string('email', 75);
             $table->string('twitter', 50);
             $table->string('instagram', 50);
-            $table->integer('f_phone');
-            $table->integer('s_phone');
-            $table->integer('cellphone');
+            $table->bigInteger('f_phone');
+            $table->bigInteger('s_phone');
+            $table->bigInteger('cellphone');
             $table->timestamps();
         });
     }

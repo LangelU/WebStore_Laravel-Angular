@@ -9,53 +9,34 @@ use DB;
 
 class CustomerController extends Controller
 {
-    public function index()
-    {
+    public function index() {
         //
     }
 
-    public function createCustomer(Request $request) {
-        $customerEmail = $request->input("cus_email");
-        $validateCustomer = DB::table('customers')
-                                ->select("*")->where('email', '=', $customerEmail)->get();
-
-        if ($validateCustomer->isEmpty()) {
-            $newCustomer = new Customer;
-
-            //First: create a customer profile
-            $newCustomer->f_name        = $request->input("f_name");
-            $newCustomer->s_name        = $request->input("s_name");
-            $newCustomer->f_lastname    = $request->input("f_lastname");
-            $newCustomer->s_lastname    = $request->input("s_lastname");
-            $newCustomer->email         = $request->input("email");
-            $newCustomer->home          = $request->input("home");
-            $newCustomer->id_number     = $request->input("id_number");
-            $newCustomer->cellphone     = $request->input("cellphone");
-            $newCustomer->save();
-
-            //Second: create a user profile to the customer
-
-
-            return response()->json(['successfull' => 'customer_created'], 200);
-        }
-        return response()->json(['error' => 'could_not_create_customer'], 409);
+    public function create(Request $request) {
+        //
     }
 
-    public function showCustomers(Customer $customer){
+    //Show all customers
+    public function showCustomers(){
         $customers = DB::table('customers')->select("*")->get();      
 
         if ($customers->isEmpty()) {
-             return response()->json(['customers_not_found'], 404);
+            return response()->json(['status'=>'error', 'message'=>
+            'Customers not found', 'response'=>'The customers table are empty'], 404);
         }
-        return response()->json($customers);
+        else{
+            return response ()->json(['status'=>'success', 'message'=>
+            'Customers found', 'response'=>['data'=>$customers]]);
+        }    
     }
 
-    public function edit(Customer $customer)
-    {
+    public function edit(Customer $customer) {
         //
     }
 
-    public function updateCustomerProfile(Request $request, $id) {
+    //Update customer profile
+    public function updateCustomerProfile(Request $request, $idUser) {
         $f_name        = $request->input("f_name");
         $s_name        = $request->input("s_name");
         $f_lastname    = $request->input("f_lastname");
@@ -72,12 +53,10 @@ class CustomerController extends Controller
                         home = '$home',
                         id_number = '$id_number',
                         cellphone = '$cellphone'
-                        WHERE ID = $id";
+                        WHERE ID = $idUser";
         $customerUpdate = DB::select($customerSQL);
-        return response()->json(['successfull' => 'customer_updated'], 200);
-    }
 
-    public function destroy() {
-        
+        return response()->json(['status'=>'success', 'message'=>
+        'Customer updated successfully', 'response'=>['data'=>$customerUpdate]], 200);
     }
 }

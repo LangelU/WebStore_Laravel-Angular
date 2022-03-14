@@ -28,6 +28,9 @@ Route::post('newStaff','App\Http\Controllers\UserController@createStaffUser');
 
 Route::post('login', 'App\Http\Controllers\UserController@authenticate');
 
+Route::post('test','App\Http\Controllers\ClaimController@create');
+
+
 Route::group(['middleware' => ['jwt.verify']], function() {
 
     /*** Business Endpoints ***/
@@ -42,7 +45,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     //Create a new category
     Route::post('newCategory','App\Http\Controllers\CategoryController@createCategory');
     // Edit a category
-    Route::put('updateCategory/{id}','App\Http\Controllers\CategoryController@updateCategory');
+    Route::put('updateCategory/{idCategory}','App\Http\Controllers\CategoryController@updateCategory');
     // Show all categories
     Route::get('showCategories','App\Http\Controllers\CategoryController@showCategories');
     // Edit category
@@ -92,7 +95,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     /*** Products Endpoints ***/
     //Create a new product
-    Route::post('newPicture','App\Http\Controllers\ProductController@uploadProductPicture');
+    Route::post('newProduct','App\Http\Controllers\ProductController@create');
     // Edit a product
     Route::put('editProduct','App\Http\Controllers\ProductController@updateProduct');
     // Show all products
@@ -112,7 +115,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     /*** Ratings Endpoints ***/
     //Create a new rating
-    Route::post('newRating','App\Http\Controllers\RatingController@createRating');
+    Route::post('newRating/{idUser}/{idProduct}','App\Http\Controllers\RatingController@createRating');
     // Edit a rating
     Route::put('editRating','App\Http\Controllers\RatingController@updateRating');
     // Show all ratings
@@ -122,19 +125,21 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     /*** Requests Endpoints ***/
     //Create a new request
-    Route::post('newRequest','App\Http\Controllers\RequestController@createRequest');
+    Route::post('newRequest','App\Http\Controllers\ClaimController@createRequest');
     // Edit a request
     Route::put('editRequest','App\Http\Controllers\RequestController@updateRequest');
     // Show all requests
     Route::get('showRequests','App\Http\Controllers\RequestController@showRequests');
     // Delete a request
     Route::post('deleteRequest','App\Http\Controllers\RequestController@deleteRequest');
+    //Attend request
+    Route::put('attendRequest','App\Http\Controllers\ClaimController@attendRequest');
 
     /*** Roles Endpoints ***/
     //Create a new role
-    Route::post('newRole','App\Http\Controllers\RoleController@createRole');
+    Route::post('newRoles','App\Http\Controllers\RoleController@createRoles');
     // Edit a role
-    Route::put('editRole','App\Http\Controllers\RoleController@updateRole');
+    Route::put('updateRole/{idRole}','App\Http\Controllers\RoleController@updateRole');
     // Show all roles
     Route::get('showRoles','App\Http\Controllers\RoleController@showRoles');
     // Delete a role

@@ -15,7 +15,7 @@ class CreatePicturesTable extends Migration
     {
         Schema::create('pictures', function (Blueprint $table) {
             $table->bigIncrements('ID');
-            $table->unsignedBigInteger('ID_product');
+            $table->string('productReference');
             $table->string("picture", 200);
             $table->timestamps();
         });

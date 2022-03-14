@@ -4,84 +4,99 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\Product;
 use DB;
 
 class CategoryController extends Controller
 {
-    public function index()
-    {
+    public function index() {
         //
     }
 
     //Create a new category
     public function createCategory(Request $request) {
         $categoryName = $request->input("cat_name");
-        $validateCategory = DB::table('categories')
-                                ->select("*")->where('name', '=', $categoryName)->get();
+        $validateCategory = DB::table('categories')->select("*")
+        ->where('name', '=', $categoryName)->get();
 
         if ($validateCategory->isEmpty()) {
             $newCategory = new Category;
-
             $newCategory->name  = $request->input("cat_name");
             $newCategory->save();
 
             return response ()->json (['status'=>'success','message'=>
-            'Category created Successfully','response'=>['data'=>$newCategory]], 200); 
+            'Category created successfully','response'=>['data'=>$newCategory]], 200); 
         }
-        return response ()->json (['status'=>'error','message'=>
-        'Could not create category', 'response'=> 'Already exists the category'], 409); 
+        else{
+            return response ()->json (['status'=>'error','message'=>
+            'Could not create category', 'response'=> 'Already exists the category'], 409); 
+        }    
     }
 
     //Show all categories
-    public function showCategories(Category $category) {
+    public function showCategories() {
         $categories = DB::table('categories')->select("*")->get();      
 
         if ($categories->isEmpty()) {
             return response ()->json (['status'=>'error','message'=>
-            'Categories not found'], 404); 
+            'Categories not found', 'response'=>'Categories table are empty'], 404); 
         }
-        return response ()->json (['status'=>'success','message'=>
+        else{
+            return response ()->json (['status'=>'success','message'=>
             'Categories found','response'=>['data'=>$categories]], 200);
+        }       
     }
 
+    //Edit category
     public function editCategory($id) {
         $editCategory = Category::findOrFail($id);
         return (['editCategory' => $editCategory]);
     }
 
-    public function updateCategory(Request $request, $id) {
+    //Update category
+    public function updateCategory(Request $request, $idCategory) {
         $categoryName = $request->input("cat_name");
         $nameSQL = DB::table("categories")->select("name")
-        ->where('ID', '=', $id)
+        ->where('ID', '=', $idCategory)
         ->where('name','=',$categoryName)->get();
 
         if ($nameSQL->isEmpty()) {
             $previousCategory =  DB::table("categories")->select("*")
-            ->where('ID', '=', $id)->get();
-    
+            ->where('ID', '=', $idCategory)->get();
+            
             $categorySQL = "UPDATE categories SET
                             name = '$categoryName'
-                            WHERE ID = $id";
+                            WHERE ID = $idCategory";
             $categoryUpdated = DB::select($categorySQL);
             $categoryData = DB::table("categories")->select("*")
-            ->where('ID', '=', $id)->get();
+            ->where('ID', '=', $idCategory)->get();
 
             return response ()->json (['status'=>'success','message'=>
-            'Category updated Successfully', 'response'=>
+            'Category updated successfully', 'response'=>
             ['data'=>['previous'=>$previousCategory, 'new'=>$categoryData]]], 200); 
         }
         else {
             return response ()->json (['status'=>'error','message'=>
-            'Could not update the category', 
-            'response'=>'The category already have same name'], 409);
+            'Could not update the category', 'response'=>
+            'The category already have same name'], 409);
         }
     }
 
+    //Delete category
     public function deleteCategory($id) {
-        $deleteSQL = "DELETE from categories
-                      WHERE ID = $id";
-        $deleteCategory = DB::select($deleteSQL);
-        return response ()->json (['status'=>'success','message'=>
-        'Category deleted Successfully'], 200); 
+        $validateSQL = DB::table("products")->select("*")
+        ->where('ID_category', '=', $id)->get();
+
+        if ($validateSQL->isEmpty()) {
+            $deleteSQL = "DELETE FROM categories WHERE ID = $id";
+            $deleteCategory = DB::select($deleteSQL);
+            
+            return response ()->json (['status'=>'success','message'=>
+            'Category deleted successfully'], 200);
+        }
+        else {
+            return response ()->json (['status'=>'error','message'=>
+            'There is at least one product with this category'], 200);
+        }
     }
 }

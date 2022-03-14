@@ -20,9 +20,9 @@ class CreateProductsTable extends Migration
             $table->string('type', 100);
             $table->string('description', 1000);
             $table->string('details', 1000);
-            $table->integer('price');
+            $table->bigInteger('price');
             $table->unsignedBigInteger('ID_category');
-            $table->integer('stock');
+            $table->bigInteger('stock');
             $table->string('brand', 50);
             $table->string('model', 50);
             $table->timestamps();

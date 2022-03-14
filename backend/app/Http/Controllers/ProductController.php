@@ -11,24 +11,23 @@ use App\Models\Picture;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
+    public function index() {
         //
     }
 
-    public function create(){
-        //
+    public function create(Request $request){
+        $n = $request->input("n");
+        print($n);
     }
 
     //Create a new product
-    public function createProduct(Request $request, $id){
+    public function createProduct(Request $request){
         $produtReference = $request->input("reference");
         $validateExistence = DB::table("products")->select("*")
-            ->where('reference', '=', $produtReference)->get();
-        if($validateExistence->isEmpty()){
-            // First: saving product data
-            $newProduct = new Product;
+        ->where('reference', '=', $produtReference)->get();
 
+        if($validateExistence->isEmpty()){
+            $newProduct = new Product;
             $newProduct->reference = $request->input("reference");
             $newProduct->name = $request->input("prod_name");
             $newProduct->type = $request->input("prod_type");
@@ -43,62 +42,76 @@ class ProductController extends Controller
             $newProduct->save();
 
             return response ()->json (['status'=>'success','message'=>
-            'Product data saved Successfully','response'=>['data'=>$newProduct]], 200);
+            'Product data saved successfully','response'=>['data'=>$newProduct]], 200);
         }
-        return response ()->json (['status'=>'error','message'=>
-        'Could not save the product data','response'=>'Already exist the product'], 409);
+        else{
+            return response ()->json (['status'=>'error','message'=>
+            'Could not save the product data','response'=>'Already exist the product'], 409);
+        }  
     }
 
-    public function show(Product $product){
+    //Show all products
+    public function showAllProducts(Product $product){
         $products = DB::table("products")->select("*")->get();
 
         if ($products->isEmpty()) {
             return response ()->json (['status'=>'error','message'=>
-            'Products not found'], 404);
+            'Products not found', 'response'=>'The products table are empty'], 404);
         }
-        return response ()->json (['status'=>'success','message'=>
-        'Products found','response'=>['data'=>$products]], 200);
+        else{
+            return response ()->json (['status'=>'success','message'=>
+            'Products found','response'=>['data'=>$products]], 200);
+        }     
     }
 
-    public function edit(Product $product)
-    {
+    public function edit(Product $product) {
         //
     }
 
-    public function update(Request $request, Product $product)
-    {
-        //
+    //Update product data
+    public function updateProductData(Request $request, $idProduct){
+        $reference      = $request->input("reference");
+        $name           = $request->input("prod_name");
+        $type           = $request->input("prod_type");
+        $description    = $request->input("prod_description");
+        $details        = $request->input("prod_details");
+        $price          = $request->input("prod_price");
+        $ID_category    = $request->input("prod_category");
+        $stock          = $request->input("prod_stock");
+        $brand          = $request->input("prod_brand");
+        $model          = $request->input("prod_model");
+
+        $updateProductSQL = "UPDATE products SET
+                             reference = '$reference',
+                             name = '$name',
+                             type = '$type',
+                             description = '$description',
+                             details = '$details',
+                             price = $price,
+                             ID_category = $ID_category,
+                             stock = $stock,
+                             brand = '$brand',
+                             model = '$model'
+                             WHERE ID = $idProduct";
+        $productUpdated = DB::select($updateProductSQL);
+        $productData = DB::table("products")->select("*")
+        ->where('ID', '=', $idProduct);
+
+        return response ()->json(['status'=>'success', 'message'=>
+        'Product data updated successfully', 'response'=>['data'=>$productData]],200);
     }
 
     //Delete the product data and their pictures
-    public function deleteProduct($id){
+    public function deleteProduct($idProduct){
         //First, delete the product data
-        $deleteProductSQL = "DELETE from products
-                             WHERE ID = $id";
+        $deleteProductSQL = "DELETE FROM products WHERE ID = $idProduct";
         $deleteProduct = DB::select($deleteproductSQL);
 
         //Second, delete the product pictures
-        $deletePicturesSQL = "DELETE from picture
-                              WHERE ID_product = $id"; 
+        $deletePicturesSQL = "DELETE FROM picture WHERE ID_product = $idProduct"; 
         $deleteProductPicture = DB::select($deletePictureSQL);
 
         return response ()->json (['status'=>'success','message'=>
-        'Category deleted Successfully'], 200);
-    }
-     
-    //Upload pictures for the new product
-    public function uploadProductPicture(Request $request) {
-        $file = $request->file('file');
-        $path = public_path().'/uploads';
-        $fileName =  'pic'.time().$file->getClientOriginalName();
-        $file->move($path, $fileName);
-
-        $newPicture = new Picture();
-        $newPicture->ID_product = 1;
-        $newPicture->picture = $fileName;
-        $newPicture->save();
-        
-        return response ()->json (['status'=>'success','message'=>
-        'Pictures uploaded Successfully'], 200);
-    } 
+        'Product deleted Successfully'], 200);
+    }   
 }

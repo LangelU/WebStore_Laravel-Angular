@@ -21,8 +21,8 @@ class CreateCustomersTable extends Migration
             $table->string('s_lastname', 20);
             $table->string('email', 20);
             $table->string('home', 50);
-            $table->integer('id_number');
-            $table->integer('cellphone');
+            $table->bigInteger('id_number');
+            $table->bigInteger('cellphone');
             $table->timestamps();
         });
     }

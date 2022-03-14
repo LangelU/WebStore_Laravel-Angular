@@ -15,8 +15,8 @@ class CreateSaleHistoriesTable extends Migration
     {
         Schema::create('sale_histories', function (Blueprint $table) {
             $table->bigIncrements('ID');
-            $table->unsignedBigInteger('ID_product');
-            $table->integer('amount');
+            $table->bigInteger("saleNumber");
+            $table->bigInteger('total_value');
             $table->unsignedBigInteger('ID_user');
             $table->timestamps();
         });

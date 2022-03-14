@@ -16,4 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('test');
 });
-Route::post('test','App\Http\Controllers\ProductController@uploadProductPicture');
+
+
+Route::post('newProduct','App\Http\Controllers\ProductController@createProduct')->name('newProduct');

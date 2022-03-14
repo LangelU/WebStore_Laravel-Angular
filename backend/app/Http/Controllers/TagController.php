@@ -21,15 +21,17 @@ class TagController extends Controller
     
         if($tagSQL->isEmpty()){
             $newTag = new Tag;
-
             $newTag->name = $request->input("tag_name");
             $newTag->save();
             
             return response ()->json (['status'=>'success','message'=>
-            'Tag created Successfully','response'=>['data'=> $newTag]], 200);  
+            'Tag created successfully','response'=>['data'=> $newTag]], 200);  
         }
-        return response ()->json (['status'=>'error','message'=>
-        'Could not create the tag','response'=>'Already exists the tag'], 409);  
+        else{
+            return response ()->json (['status'=>'error','message'=>
+            'Could not create the tag','response'=>'Already exists the tag'], 409);  
+        }
+        
     }
 
     //Show all tags
@@ -39,8 +41,11 @@ class TagController extends Controller
             return response ()->json (['status'=>'error','message'=>
         'Tags not found'], 404);
        }
-       return response ()->json (['status'=>'success','message'=>
-       'Tags found','response'=>['data'=>$tags]], 200);
+       else{
+            return response ()->json (['status'=>'success','message'=>
+            'Tags found','response'=>['data'=>$tags]], 200);
+       }
+       
     }
 
     public function edit(Tag $tag)
@@ -57,17 +62,13 @@ class TagController extends Controller
         if ($nameSQL->isEmpty()) {
             $previousTag =  DB::table("tags")->select("*")
             ->where('ID', '=', $id)->get();
-    
-            $tagSQL = "UPDATE tags SET
-                       name = '$tagName'
-                       WHERE ID = $id";
+            $tagSQL = "UPDATE tags SET name = '$tagName' WHERE ID = $id";
             $tagUpdated = DB::select($tagSQL);
-
             $tagData = DB::table("tags")->select("*")
             ->where('ID', '=', $id)->get();
 
             return response ()->json (['status'=>'success','message'=>
-            'Tag updated Successfully', 'response'=>
+            'Tag updated successfully', 'response'=>
             ['data'=>['previous'=>$previousTag, 'new'=>$tagData]]], 200);
         }
         else{

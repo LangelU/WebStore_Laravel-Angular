@@ -20,6 +20,7 @@ class CreateStaffTable extends Migration
             $table->string('f_lastname', 20);
             $table->string('s_lastname', 20);
             $table->string('email', 20);
+            $table->bigInteger('id_number');
             $table->timestamps();
         });
     }

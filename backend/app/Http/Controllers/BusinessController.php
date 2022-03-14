@@ -9,19 +9,16 @@ use DB;
 class BusinessController extends Controller
 {
     
-    public function index()
-    {
+    public function index() {
         //
     }
 
     //Create a new Business
     public function createBusiness(Request $request) {
-        $validateUniqueBusiness = DB::table('businesses')
-                                ->select("*")->get();
-
+        $validateUniqueBusiness = DB::table('businesses')->select("*")->get();
+        
         if ($validateUniqueBusiness->isEmpty()) {
             $newBusiness = new Business;
-
             $newBusiness->name          = $request->input("bus_name");
             $newBusiness->location      = $request->input("bus_location");
             $newBusiness->mission       = $request->input("bus_mission");
@@ -33,35 +30,39 @@ class BusinessController extends Controller
             $newBusiness->f_phone       = $request->input("bus_fphone");
             $newBusiness->s_phone       = $request->input("bus_sphone");
             $newBusiness->cellphone     = $request->input("bus_cellphone");
-
             $newBusiness->save();
+
             return response ()->json (['status'=>'success','message'=>
             'Business created Successfully','response'=>['data'=>$newBusiness]], 200);
         }
-        return response ()->json (['status'=>'error','message'=>
-        'Could not create business','response'=> 'Already exists the business'], 409);
+        else {
+            return response ()->json (['status'=>'error','message'=>
+            'Could not create business','response'=> 'Already exists the business'], 409);
+        }  
     }
 
     //Show business data
-    public function showBusiness(Business $business) {
-        $business = DB::table('businesses')->select("*")->get();      
+    public function showBusiness() {
+        $business = DB::table('businesses')->select("*")->get();
 
         if ($business->isEmpty()) {
             return response ()->json (['status'=>'error','message'=>
-            'Business not found'], 404);
+            'Business not found', 'response'=>'Business table are empty'], 404);
         }
-        return response ()->json (['status'=>'success','message'=>
-        'Business found', 'response'=> ['data'=>$business]], 200);
+        else {
+            return response ()->json (['status'=>'success','message'=>
+            'Business found', 'response'=> ['data'=>$business]], 200);
+        }   
     }
 
+    //Edit business data
     public function editBusiness(Business $business) {
         $editBusiness = App\Business::findOrFail($id);
         return view('formularios.editardoctor', compact('actualizarDoctor'));
     }
 
-
+    //Update business data
     public function updateBusiness(Request $request, $id) {
-
         $name          = $request->input("bus_name");
         $location      = $request->input("bus_location");
         $mission       = $request->input("bus_mission");
@@ -73,29 +74,23 @@ class BusinessController extends Controller
         $f_phone       = $request->input("bus_fphone");
         $s_phone       = $request->input("bus_sphone");
         $cellphone     = $request->input("bus_cellphone"); 
-
-        $businessSQL = "UPDATE businesses SET
-                        name        = '$name',
-                        location    = '$location',
-                        mission     = '$mission',
-                        vision      = '$vision',
-                        about_us    = '$about_us',
-                        email       = '$email',
-                        twitter     = '$twitter',
-                        instagram   = '$instagram',
-                        f_phone     = '$f_phone',
-                        s_phone     = '$s_phone',
-                        cellphone   = '$cellphone'
-                        WHERE ID    = $id";
-
-        $businessUpdated = DB::select($businessSQL);
+        $busUpdateSQL = "UPDATE businesses SET
+                         name        = '$name',
+                         location    = '$location',
+                         mission     = '$mission',
+                         vision      = '$vision',
+                         about_us    = '$about_us',
+                         email       = '$email',
+                         twitter     = '$twitter',
+                         instagram   = '$instagram',
+                         f_phone     = '$f_phone',
+                         s_phone     = '$s_phone',
+                         cellphone   = '$cellphone'
+                         WHERE ID    = $id";
+        $businessUpdated = DB::select($busUpdateSQL);
         $businessData = DB::table("businesses")->select("*")->get();
+
         return response ()->json (['status'=>'success','message'=>
         'Business updated Successfully','response'=>['data'=>$businessData]], 200); 
-    }
-
-    public function destroy(Business $business)
-    {
-        //
     }
 }

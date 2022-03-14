@@ -19,6 +19,7 @@ class CreateRatingsTable extends Migration
             $table->unsignedBigInteger('ID_user');
             $table->decimal('score', 10, 2);
             $table->string('review', 1000);
+            $table->string('response', 1000)->nulleable();
             $table->timestamps();
         });
     }

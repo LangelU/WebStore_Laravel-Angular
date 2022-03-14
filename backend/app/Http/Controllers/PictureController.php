@@ -17,10 +17,21 @@ class PictureController extends Controller
         //
     }
 
-    public function store(Request $request)
-    {
-        //
-    }
+    //Upload pictures for the new product
+    public function uploadProductPicture(Request $request) {
+        $file = $request->file('file');
+        $path = public_path().'/uploads';
+        $fileName =  'pic'.time().$file->getClientOriginalName();
+        $file->move($path, $fileName);
+
+        $newPicture = new Picture();
+        $newPicture->productReference = $request->input("reference");
+        $newPicture->picture = $fileName;
+        $newPicture->save();
+        
+        return response ()->json (['status'=>'success','message'=>
+        'Pictures uploaded Successfully'], 200);
+    } 
 
     public function show(Picture $picture)
     {
