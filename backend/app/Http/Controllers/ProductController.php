@@ -113,5 +113,36 @@ class ProductController extends Controller
 
         return response ()->json (['status'=>'success','message'=>
         'Product deleted Successfully'], 200);
-    }   
+    }
+    
+    //Show all details of a product
+    public function productDetails($idProduct){
+        //First, find product data
+        $productData = DB::table("products")->select("*")
+        ->where('ID', '=', $idProduct)->get();
+
+        //Second, find product category
+        $productCategorySQL = "SELECT c.name
+                               FROM categories c
+                               JOIN products p
+                               WHERE p.ID_category = c.ID
+                               AND p.ID = $idProduct";
+        $productCategory = DB::select($productCategorySQL);
+
+        //Third, find tags for the product
+        $productTagsSQL = "SELECT name
+                           FROM tags t
+                           JOIN product_tags pt
+                           WHERE pt.ID = t.ID
+                           AND pt.ID_product = $idProduct";
+        $productTags = DB::select($productTagsSQL);
+
+        //Product pictures
+
+        return response()->json(['status'=>'success', 'message'=>
+        'Data product found', 'response'=>
+        ['productData'=>$productData, 'productCategory'=>$productCategory,
+         'productTags'=>$productTags]], 200);
+
+    }
 }

@@ -17,7 +17,7 @@ class CustomerController extends Controller
         //
     }
 
-    //Show all customers
+    //Show all customers (Business View)
     public function showCustomers(){
         $customers = DB::table('customers')->select("*")->get();      
 
@@ -55,8 +55,16 @@ class CustomerController extends Controller
                         cellphone = '$cellphone'
                         WHERE ID = $idUser";
         $customerUpdate = DB::select($customerSQL);
-
+        $customerData = DB::table("staff")->select("*")->where('ID', '=', $idUser)->get();
         return response()->json(['status'=>'success', 'message'=>
-        'Customer updated successfully', 'response'=>['data'=>$customerUpdate]], 200);
+        'Customer updated successfully', 'response'=>['data'=>$customerData]], 200);
+    }
+
+    //Show customer profile data
+    public function customerProfileData($idUser){
+        $userData = DB::table("customers")->select("*")->where('ID', '=', $idUser)->get();
+
+        return response ()-json(['status'=>'success', 'message'=>
+        'Customer profile found', 'response'=>['data'=>$idUser]], 200);
     }
 }

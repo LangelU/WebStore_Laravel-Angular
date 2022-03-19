@@ -13,7 +13,7 @@ class ClaimController extends Controller
     }
 
     //Number generator to Request unique number
-     public function reqNumberGenerator(){
+    public function reqNumberGenerator(){
         $number = rand(0000000001, 9999999999);
         return $number;
     }
@@ -27,9 +27,11 @@ class ClaimController extends Controller
         
 
         if ($validateExistence->isEmpty()) {
+            $requestNumber = $this->reqNumberGenerator();
+            /*
             return response ()->json(['status'=>'error', 'message'=>
             'Purchase not found', 
-            'response'=>'The number does not exist in the invoice table'],404);
+            'response'=>'The number does not exist in the invoice table'],404);*/
         }
         else {
             $validateReqNumber = DB::table("claims")->select("*")

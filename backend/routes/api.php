@@ -95,7 +95,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     /*** Products Endpoints ***/
     //Create a new product
-    Route::post('newProduct','App\Http\Controllers\ProductController@create');
+    Route::post('newProduct','App\Http\Controllers\ProductController@createProduct');
     // Edit a product
     Route::put('editProduct','App\Http\Controllers\ProductController@updateProduct');
     // Show all products
@@ -166,4 +166,14 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     //Rutas de Usuario
     Route::post('user','App\Http\Controllers\UserController@getAuthenticatedUser');
 
+    /*** ShoppingCart Endpoints ***/
+    //Add a product
+    Route::post('addProduct/{idProduct}/{idUser}/{productPrice}','App\Http\Controllers\ShoppingCartController@addNewProduct');
+    //Show shopping cart content
+    Route::get('shoppingCart/{idUser}','App\Http\Controllers\ShoppingCartController@showContent');
+    //Delete a producto for the shopping cart
+    Route::delete('deleteProduct/{idUser}/{idProduct}','App\Http\Controllers\ShoppingCartController@deleteProduct');
+    //Validate shopping cart
+    Route::post('validateCart/{idUser}','App\Http\Controllers\ShoppingCartController@validateCart');
+    Route::get('test/{idUser}','App\Http\Controllers\ShoppingCartController@test');
 });
