@@ -26,7 +26,7 @@ class ProductTagController extends Controller
             $newTag->save();
 
             return response ()->json(['status'=>'success', 'message'=>
-            'Tag added succesfully', 'response'=>['data'=>$newTag]],200);
+            'Tag added succesfully', 'response'=>['data'=>$newTag]],201);
         }
         else {
             return response ()->json(['status'=>'error', 'message'=>

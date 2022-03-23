@@ -20,18 +20,18 @@ class ClaimController extends Controller
     
     //Create a new request (client)
     public function createRequest(Request $request){
-        $invoiceNumber = $request->input("req_invNumber");
+        $saleNumber = $request->input("req_invNumber");
         $requestNumber = $this->reqNumberGenerator();
-        $validateExistence = DB::table("invoices")->select("*")
-        ->where('invoice_number', '=', $invoiceNumber)->get();
+        $validateExistence = DB::table("sale_histories")->select("*")
+        ->where('saleNumber', '=', $saleNumber)->get();
         
 
         if ($validateExistence->isEmpty()) {
-            $requestNumber = $this->reqNumberGenerator();
-            /*
+            
+            
             return response ()->json(['status'=>'error', 'message'=>
             'Purchase not found', 
-            'response'=>'The number does not exist in the invoice table'],404);*/
+            'response'=>'The sale number does not exist'],404);
         }
         else {
             $validateReqNumber = DB::table("claims")->select("*")
@@ -50,11 +50,12 @@ class ClaimController extends Controller
                 $newRequest->save();
             
                 return response ()->json(['status'=> 'success', 'message'=>
-                'Request generated', 'response'=>['data'=>$newRequest]]);
+                'Request generated', 'response'=>['data'=>$newRequest]], 201);
             }
             else{
                 return response ()->json(['status'=>'error', 'message'=>
-                'Could not procesate request', 'response'=>'internal error'], 500);
+                'Could not procesate request',
+                'response'=>'Internal error, try again'], 500);
             }
         }   
     }

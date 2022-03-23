@@ -30,7 +30,7 @@ class PictureController extends Controller
         $newPicture->save();
         
         return response ()->json (['status'=>'success','message'=>
-        'Pictures uploaded Successfully'], 200);
+        'Pictures uploaded Successfully'], 201);
     } 
 
     public function show(Picture $picture)

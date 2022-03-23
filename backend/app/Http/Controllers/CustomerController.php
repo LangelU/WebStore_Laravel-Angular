@@ -27,7 +27,7 @@ class CustomerController extends Controller
         }
         else{
             return response ()->json(['status'=>'success', 'message'=>
-            'Customers found', 'response'=>['data'=>$customers]]);
+            'Customers found', 'response'=>['data'=>$customers]], 200);
         }    
     }
 

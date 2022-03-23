@@ -25,7 +25,7 @@ class CategoryController extends Controller
             $newCategory->save();
 
             return response ()->json (['status'=>'success','message'=>
-            'Category created successfully','response'=>['data'=>$newCategory]], 200); 
+            'Category created successfully','response'=>['data'=>$newCategory]], 201); 
         }
         else{
             return response ()->json (['status'=>'error','message'=>
@@ -96,7 +96,8 @@ class CategoryController extends Controller
         }
         else {
             return response ()->json (['status'=>'error','message'=>
-            'There is at least one product with this category'], 200);
+            'There is at least one product with this category',
+            'response'=>['data'=>$validateSQL]], 400);
         }
     }
 }

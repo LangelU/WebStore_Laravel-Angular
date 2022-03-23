@@ -25,7 +25,7 @@ class FavoriteController extends Controller
             $newFavorite->save();
 
             return response ()->json(['status'=>'success', 'message'=>
-            'Favorite added successfully', 'response'=> ['data'=>$newFavorite]],200);
+            'Favorite added successfully', 'response'=> ['data'=>$newFavorite]],201);
         }
         else {
             return response ()->json(['status'=>'error', 'message'=>

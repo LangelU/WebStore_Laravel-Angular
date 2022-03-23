@@ -42,7 +42,7 @@ class ProductController extends Controller
             $newProduct->save();
 
             return response ()->json (['status'=>'success','message'=>
-            'Product data saved successfully','response'=>['data'=>$newProduct]], 200);
+            'Product data saved successfully','response'=>['data'=>$newProduct]], 201);
         }
         else{
             return response ()->json (['status'=>'error','message'=>
@@ -140,9 +140,9 @@ class ProductController extends Controller
         //Product pictures
 
         return response()->json(['status'=>'success', 'message'=>
-        'Data product found', 'response'=>
-        ['productData'=>$productData, 'productCategory'=>$productCategory,
-         'productTags'=>$productTags]], 200);
+        'Data product found', 'response'=>[
+        'productData'=>$productData, 'productCategory'=>$productCategory,
+        'productTags'=>$productTags]], 200);
 
     }
 }

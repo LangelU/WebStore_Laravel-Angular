@@ -36,7 +36,7 @@ class RatingController extends Controller
 
         return response ()->json (['status'=>'success','message'=>
         'Comment created Successfully', 'response'=>
-        ['data'=>['comment'=>$newRating, 'user'=>$user, 'product'=>$product]]], 200);
+        ['data'=>['comment'=>$newRating, 'user'=>$user, 'product'=>$product]]], 201);
     }
 
     //Show ratings for a product

@@ -81,8 +81,7 @@ class TagController extends Controller
     }
 
     public function deleteTag($id){
-        $deleteSQL = "DELETE from tags
-                      WHERE ID = $id";
+        $deleteSQL = "DELETE from tags WHERE ID = $id";
         $deleteTag = DB::select($deleteSQL);
         return response ()->json (['status'=>'success','message'=>
             'Tag deleted Successfully'], 200);

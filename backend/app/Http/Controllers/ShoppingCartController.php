@@ -44,7 +44,7 @@ class ShoppingCartController extends Controller
             ->where('ID_user', '=', $idUser)->get();
 
             return response ()->json(['status'=>'success', 'message'=>
-            'Product added successfully', 'response'=>['data'=>$productAdded]],200);
+            'Product added successfully', 'response'=>['data'=>$productAdded]],201);
         }
         //If exist, update the amount
         else {

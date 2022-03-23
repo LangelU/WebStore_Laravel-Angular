@@ -31,9 +31,10 @@ class BusinessController extends Controller
             $newBusiness->s_phone       = $request->input("bus_sphone");
             $newBusiness->cellphone     = $request->input("bus_cellphone");
             $newBusiness->save();
+            $businessData = DB::table('businesses')->select("*")->get();
 
             return response ()->json (['status'=>'success','message'=>
-            'Business created Successfully','response'=>['data'=>$newBusiness]], 200);
+            'Business created Successfully','response'=>['data'=>$businessData]], 201);
         }
         else {
             return response ()->json (['status'=>'error','message'=>
@@ -47,7 +48,7 @@ class BusinessController extends Controller
 
         if ($business->isEmpty()) {
             return response ()->json (['status'=>'error','message'=>
-            'Business not found', 'response'=>'Business table are empty'], 404);
+            'Business not found', 'response'=>'Business´s data are empty'], 404);
         }
         else {
             return response ()->json (['status'=>'success','message'=>
