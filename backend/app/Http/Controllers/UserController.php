@@ -11,6 +11,9 @@ use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Log;
 use DB;
+use Mail;
+use App\Mail\EmailVerification;
+use App\Models\VerifyTokens;
 
 class UserController extends Controller
 {
@@ -51,8 +54,13 @@ class UserController extends Controller
         return response()->json(compact('user'));
     }
 
+    public function confirmCodeGenerator(){
+        $number = rand(000001, 999999);
+        return $number;
+    }
 
     public function register(Request $request) {
+        $email = $request->get('email');
         Log::info($request);
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:255|unique:users',
@@ -63,17 +71,35 @@ class UserController extends Controller
         if($validator->fails()){
             return response()->json($validator->errors()->toJson(),400);
         }
-
+        
+        
         $user = User::create([
-            'email' => $request->get('email'),
+            'email' => $email,
             'ID_role' => $request->get('role'),
             'password' => Hash::make($request->get('password')),
         ]);
+
+        //Generate the verification Code
+        $verifyCode = $this->confirmCodeGenerator();
+        $verificationToken = new VerifyTokens;
+        $verificationToken->email = $email;
+        $verificationToken->verification_token = $verifyCode;
+        $verificationToken->save();
+
+        //Send the e-mail whith the verification code
+        $verificationData = array('email'=> $email, 'code'=>$verifyCode);
+        Mail::send('email_verification', $verificationData, function($message)
+            use($verificationData) {
+            $message->to($verificationData['email'])->subject('Verificación de correo');
+            $message->from('WebStore@gmail.com','Equipo Webstore');
+         });
         $token = JWTAuth::fromUser($user);
 
-        return response()->json(compact('user','token'),201);
+        return response ()->json (['status'=>'success','message'=>
+        'User registered Successfully','response'=>compact('user','token')], 201); 
     }
 
+    //
     public function createCustomerUser(Request $request) {
         $customerEmail = $request->input("email");
         $customerID = $request->input("id_number");
@@ -110,14 +136,30 @@ class UserController extends Controller
                 'password' => Hash::make($request->get('password')),
             ]);
 
+            //Send the e-mail whith the verification code
+            $userEmail = $request->get('email');
+            $verifyCode = $this->confirmCodeGenerator();
+            $verificationToken = new VerifyTokens;
+            $verificationToken->email = $userEmail;
+            $verificationToken->verification_token = $verifyCode;
+            $verificationToken->type = 2;
+            $verificationToken->save();
+
+            $verificationData = array('email'=> $userEmail, 'code'=>$verifyCode);
+            Mail::send('email_verification', $verificationData, function($message)
+                use($verificationData) {
+                $message->to($verificationData['email'])->subject('Verificación de correo');
+                $message->from('WebStore@gmail.com','Equipo Webstore');
+            });
             $token = JWTAuth::fromUser($user);
+
             return response ()->json (['status'=>'success','message'=>
-            'User created Successfully','response'=>['data'=>$newCustomer]], 200); 
+            'User registered Successfully','response'=>['token'=>$token]], 201);  
             
         }
         else{
             return response ()->json (['status'=>'error','message'=>
-            'Could not create the user','response'=> 'Alreade exists the user'], 409);
+            'Could not create the user','response'=> 'Already exists the user'], 409);
         }   
     }
 
@@ -152,15 +194,35 @@ class UserController extends Controller
                 'ID_role' => 2,
                 'password' => Hash::make($request->get('password')),
             ]);
-
+            //Send the e-mail whith the verification code
+            $verificationData = array('email'=> $email, 'code'=>$verifyCode);
+            Mail::send('email_verification', $verificationData, function($message)
+                use($verificationData) {
+                $message->to($verificationData['email'])->subject('Verificación de correo');
+                $message->from('WebStore@gmail.com','Equipo Webstore');
+            });
             $token = JWTAuth::fromUser($user);
+
             return response ()->json (['status'=>'success','message'=>
-            'Staff created successfully','response'=>['data'=>$newStaff]], 200);
+            'Staff registered Successfully','response'=>compact('user','token')], 201); 
             
         }
         else{
             return response ()->json (['status'=>'error','message'=>
             'Could not create the staff','response'=> 'Alreade exists the staff'], 409); 
         }  
-    }          
+    }
+    
+    public function verify($code) {
+        $user = User::where('confirmation_code', $code)->first();
+
+        if (! $user)
+            return redirect('/');
+
+        $user->confirmed = true;
+        $user->confirmation_code = null;
+        $user->save();
+
+        return redirect('/home')->with('notification', 'Has confirmado correctamente tu correo!');
+    }
 }

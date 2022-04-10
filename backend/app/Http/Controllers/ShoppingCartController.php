@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ShoppingCart;
 use Illuminate\Http\Request;
-use DB;
-use App\Models\Sale;
+use App\Models\ShoppingCart;
+use App\Models\Customer;
+use App\Models\VerifyTokens;
 use App\Models\SaleHistory;
+use App\Models\Sale;
+use App\Models\User;
+use App\Mail\EmailVerification;
+use DB;
+use Mail;
 
 class ShoppingCartController extends Controller
 {
@@ -44,7 +49,7 @@ class ShoppingCartController extends Controller
             ->where('ID_user', '=', $idUser)->get();
 
             return response ()->json(['status'=>'success', 'message'=>
-            'Product added successfully', 'response'=>['data'=>$productAdded]],201);
+            'Product added successfully', 'response'=>['data'=>$productAdded]],200);
         }
         //If exist, update the amount
         else {
@@ -59,7 +64,7 @@ class ShoppingCartController extends Controller
 
             return response ()->json(['status'=>'success', 'message'=>
             'Amount updated successfully', 
-            'response'=>['data'=>$productUpdated]], 409);
+            'response'=>['data'=>$productUpdated]], 201);
         }
     }
 
@@ -101,16 +106,17 @@ class ShoppingCartController extends Controller
 
     //Number generator to Request unique number
     public function buyNumberGenerator(){
-        $sellNumber = rand(0000000001, 9999999999);
-        return $sellNumber;
+        $saleNumber = rand(0000000001, 9999999999);
+        return $saleNumber;
     }
 
-    public function validateCart($idUser) {
-        $sellNumber = $this->buyNumberGenerator();
+    public function validateCart($idUser, $emailUser) {
+        $saleNumber = $this->buyNumberGenerator();
         $validateExistence = DB::table("sales")->select("*")
-        ->where('saleNumber', '=', $sellNumber)->get();
+        ->where('saleNumber', '=', $saleNumber)->get();
         $items = ShoppingCart::where('ID_user', '=', $idUser)->get();
         $purchasedItems = $this->showContent($idUser);
+        $email = DB::table("users")->select("email")->where('ID', '=', $idUser)->get();
 
         //First, add the buy to the Sales table
         if ($validateExistence->isEmpty()) {
@@ -124,7 +130,7 @@ class ShoppingCartController extends Controller
                             total_value,
                             created_at,
                             updated_at)
-                            SELECT $sellNumber,
+                            SELECT $saleNumber,
                             ID_product,
                             ID_user,
                             amount,
@@ -144,7 +150,7 @@ class ShoppingCartController extends Controller
                                   created_at,
                                   updated_at) 
                                   VALUES 
-                                  ($sellNumber,
+                                  ($saleNumber,
                                   (SELECT SUM(sub_totalValue)
                                   FROM shopping_carts sc
                                   WHERE sc.ID_user = $idUser),
@@ -154,23 +160,55 @@ class ShoppingCartController extends Controller
             $totalValue = DB::select($addSaleHistorySQL);
             
             //Third, delete all items for the shopping cart
-            $deleteShoppingCartSQL = "DELETE FROM shopping_carts WHERE ID_user = $idUser";
-            $deleteShoppingCart = DB::select($deleteShoppingCartSQL);
-            
+            //$deleteShoppingCartSQL = "DELETE FROM shopping_carts WHERE ID_user = $idUser";
+            //$deleteShoppingCart = DB::select($deleteShoppingCartSQL);
+
+            //Fourth, capture data to the e-mail notification
+
+            $customerName = DB::table('customers')
+            ->join('users', 'users.email', '=', 'customers.email')
+            ->join('sales', 'sales.ID_user', '=', 'users.ID')
+            ->select('customers.f_name','customers.f_lastname')
+            ->limit(1)
+            ->get();
+
+            $saleDetail = DB::table('products')
+            ->join('sales', 'sales.ID_product', '=', 'products.ID')
+            ->where('sales.saleNumber', '=', $saleNumber)
+            ->where('sales.ID_user', '=', $idUser)
+            ->select("*")
+            ->get();
+
+            $email = DB::table("users")
+            ->where('ID', '=', $idUser)
+            ->select("email")
+            ->get();
+
+
+            $customerName = Customer::where('customers.ID', '=', $idUser )
+            ->get();
+            //Second: capture the total value of the sale
+            $saleHistory = SaleHistory::where('ID_user', '=', $idUser)->get();
+                                      
+            Mail::send('sale_notification', ['content'=>$customerName,
+                                             'totalValue'=>$saleHistory,
+                                             'saleDate'=>$saleHistory,
+                                             'saleNumber'=>$saleNumber,
+                                             'saleDetail'=>$saleDetail], 
+                                             function($message)
+                use($customerName, $saleHistory, $saleNumber, $saleDetail, $emailUser) {
+                $message->to($emailUser)->subject('Compra validada');
+                $message->from('WebStore@gmail.com','Equipo Webstore');
+            });
+
             return response ()->json(['status'=>'success', 'message'=>
             'Buy validated successfully', 'response'=>
-            ['purchasedItems'=>$purchasedItems]], 200);
+            ['purchasedItems'=>$email]], 200);
             
         } else {
             return response ()->json(['status'=>'error', 'message'=>
             'Internal error', 'response'=>'Try again'], 500);
         }
-    }
-
-    public function test($id){
-        $result = ShoppingCart::where('ID_user', '=', $id)->get();
-        return $result;
-        
     }
 
     public function deleteCart($idUser){
@@ -180,4 +218,43 @@ class ShoppingCartController extends Controller
         return response ()->json(['status'=>'success', 'message'=>
         'Cart deleted successfully'], 200);
     }
+
+    public function test($idUser){
+        $saleNumber = 3167287159;
+        //Customer name
+        $customerName = DB::table('customers')
+        ->join('users', 'users.email', '=', 'customers.email')
+        ->join('sales', 'sales.ID_user', '=', 'users.ID')
+        ->select('customers.f_name', 'customers.f_lastname')
+        ->limit(1)
+        ->get();
+
+
+        //Sale detail
+        $saleDetail = DB::table('products')
+        ->join('sales', 'sales.ID_product', '=', 'products.ID')
+        ->where('sales.saleNumber', '=', $saleNumber)
+        ->where('sales.ID_user', '=', $idUser)
+        ->select('products.reference',
+                 'products.name',
+                 'sales.unitary_value',
+                 'sales.amount',
+                 'sales.total_value')
+        ->get();
+
+        $totalValue = DB::table("sale_histories")->select("total_value")
+        ->where('ID_user', '=', $idUser)->get();
+
+        //Array to capture all data for send in e-mail body
+        $data = array('name'=>$customerName,
+                      'saleDetails'=>$saleDetail,
+                      'saleNumber'=>$saleNumber);
+        return response ()->json(['status'=>'success', 'message'=>
+        'Success',
+        'response'=>
+        ['name'=>$data['name'], 
+         'saleDetails'=>$data['saleDetail'],
+         'total'=>$totalValue]], 200);
+    }
 }
+

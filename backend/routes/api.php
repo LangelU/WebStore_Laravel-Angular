@@ -18,8 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-
 Route::post('register', 'App\Http\Controllers\UserController@register');
 //Create a new customer
 Route::post('newCustomer','App\Http\Controllers\UserController@createCustomerUser');
@@ -28,8 +26,13 @@ Route::post('newStaff','App\Http\Controllers\UserController@createStaffUser');
 
 Route::post('login', 'App\Http\Controllers\UserController@authenticate');
 
-Route::post('test','App\Http\Controllers\ClaimController@create');
+Route::get('test','App\Http\Controllers\ShoppingCartController@test');
+Route::get('/register/verify/{code}', 'UserController@verify');
 
+Route::get('verify', function(){
+    $email = new EmailVerification;
+    
+});
 
 Route::group(['middleware' => ['jwt.verify']], function() {
 
@@ -174,6 +177,14 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     //Delete a producto for the shopping cart
     Route::delete('deleteProduct/{idUser}/{idProduct}','App\Http\Controllers\ShoppingCartController@deleteProduct');
     //Validate shopping cart
-    Route::post('validateCart/{idUser}','App\Http\Controllers\ShoppingCartController@validateCart');
+    Route::post('validateCart/{idUser}/{emailUser}','App\Http\Controllers\ShoppingCartController@validateCart');
     Route::get('test/{idUser}','App\Http\Controllers\ShoppingCartController@test');
+
+    /***Analytics Endpoints ***/
+    //Get best sellers of the month
+    Route::get('bestSellers','App\Http\Controllers\Analytics@showBestSellers');
+    //Get the worst sellers of the month
+    Route::get('worstSellers','App\Http\Controllers\Analytics@showWorstSellers');
+    //Get the best customers on the month
+    Route::get('bestCustomers','App\Http\Controllers\Analytics@bestCustomersPerMonth');
 });
