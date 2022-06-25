@@ -29,9 +29,9 @@
         <br>
         Modelo:             {{ $product->model }}.
         <br>
-        Precio unitario:    {{ $product->unitary_value }}.
+        Precio unitario:    ${{ $product->unitary_value }} pesos.
         <br>
-        Cantidad afquirida: {{ $product->amount }}.
+        Cantidad adquirida: {{ $product->amount }}.
         <br>
         Subtotal:           ${{ $product->total_value }} pesos.
         <br>

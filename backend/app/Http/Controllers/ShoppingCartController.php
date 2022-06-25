@@ -164,7 +164,6 @@ class ShoppingCartController extends Controller
             //$deleteShoppingCart = DB::select($deleteShoppingCartSQL);
 
             //Fourth, capture data to the e-mail notification
-
             $customerName = DB::table('customers')
             ->join('users', 'users.email', '=', 'customers.email')
             ->join('sales', 'sales.ID_user', '=', 'users.ID')
@@ -190,7 +189,7 @@ class ShoppingCartController extends Controller
             //Second: capture the total value of the sale
             $saleHistory = SaleHistory::where('ID_user', '=', $idUser)->get();
                                       
-            Mail::send('sale_notification', ['content'=>$customerName,
+            Mail::send('emailNotifications.sale_notification', ['content'=>$customerName,
                                              'totalValue'=>$saleHistory,
                                              'saleDate'=>$saleHistory,
                                              'saleNumber'=>$saleNumber,
@@ -202,8 +201,8 @@ class ShoppingCartController extends Controller
             });
 
             return response ()->json(['status'=>'success', 'message'=>
-            'Buy validated successfully', 'response'=>
-            ['purchasedItems'=>$email]], 200);
+            'Buy validated successfully', 
+            'response'=>'Sale validated and email notification sent'], 200);
             
         } else {
             return response ()->json(['status'=>'error', 'message'=>

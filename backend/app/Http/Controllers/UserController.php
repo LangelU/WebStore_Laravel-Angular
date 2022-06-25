@@ -146,7 +146,7 @@ class UserController extends Controller
             $verificationToken->save();
 
             $verificationData = array('email'=> $userEmail, 'code'=>$verifyCode);
-            Mail::send('email_verification', $verificationData, function($message)
+            Mail::send('emailNotifications.email_verification', $verificationData, function($message)
                 use($verificationData) {
                 $message->to($verificationData['email'])->subject('Verificación de correo');
                 $message->from('WebStore@gmail.com','Equipo Webstore');

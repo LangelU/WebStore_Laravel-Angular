@@ -178,7 +178,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::delete('deleteProduct/{idUser}/{idProduct}','App\Http\Controllers\ShoppingCartController@deleteProduct');
     //Validate shopping cart
     Route::post('validateCart/{idUser}/{emailUser}','App\Http\Controllers\ShoppingCartController@validateCart');
-    Route::get('test/{idUser}','App\Http\Controllers\ShoppingCartController@test');
+    Route::get('test/{idRequest}','App\Http\Controllers\ClaimController@test');
 
     /***Analytics Endpoints ***/
     //Get best sellers of the month
